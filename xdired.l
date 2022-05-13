@@ -78,7 +78,7 @@
   (define-key *xdired-map* '(#\* #\*) 'xdired-mark-executables)
   (define-key *xdired-map* '(#\* #\c) 'xdired-change-marks)
   (define-key *xdired-map* '(#\% #\m) 'xdired-mark-regexp)
-  (define-key *xdired-map* '(#\C-c #\Backspace) 'xdired-up-directory)
+  (define-key *xdired-map* '(#\C-c #\C-h) 'xdired-up-directory)
   (define-key *xdired-map* '(#\C-c #\C-c) 'xdired-do-shell-execute)
   (define-key *xdired-map* '(#\C-c #\C-e) #'(lambda () (interactive) (shell-execute (default-directory))))
   (define-key *xdired-map* '(#\C-c #\C-x) 'xdired-send-to)
@@ -409,7 +409,7 @@
 			  (return t))
 		      (progn
 			(message "[~A] Rename: ~A to ~A" (format-date-string "%H:%M:%S") item dest)
-			(unless (y-or-n-p "~A Retry ? " (or errmsg "Rename failed."))
+			(unless (y-or-n-p "~A Retry?" (or errmsg "Rename failed."))
 			  (return nil)))))
 		  (if doMove
 		      (do-events))))
@@ -450,7 +450,7 @@
 			  (return t))
 		      (progn
 			(message "[~A] touch ~A , ~A" (format-date-string "%H:%M:%S") item (format-date-string "%Y-%m-%d %H:%M:%S" newtime))
-			(unless (y-or-n-p "~A Retry? " (or errmsg "Rename failed."))
+			(unless (y-or-n-p "~A Retry?" (or errmsg "Rename failed."))
 			  (return nil)))))))
 	    items)
       (if (< 0 succeed)
@@ -489,7 +489,7 @@
 			  (return t))
 		      (progn
 			(message "[~A] chmod ~A , ~A" (format-date-string "%H:%M:%S") item opr)
-			(unless (y-or-n-p "~A Retry? " (or errmsg "Rename failed."))
+			(unless (y-or-n-p "~A Retry?" (or errmsg "Rename failed."))
 			  (return nil))))))))
 	  items)
     (if (< 0 succeed)
@@ -519,7 +519,7 @@
 			(return t))
 		    (progn
 		      (message "[~A] create-shortcut ~A to ~A" (format-date-string "%H:%M:%S") item dest)
-		      (unless (y-or-n-p "~A Retry? " (or errmsg "create-shortcut failed."))
+		      (unless (y-or-n-p "~A Retry?" (or errmsg "create-shortcut failed."))
 			(return nil)))))))
 	  items)
     (if (< 0 succeed)
@@ -547,7 +547,7 @@
   (let ((items (xdired-get-marked-or-current))
 	(succeed 0))
     (if (= 0 (length items)) (quit))
-    (if (y-or-n-p (concat "Compress or uncompress " (if (= 1 (length items)) (car items) (format nil "[~D items]" (length items))) ": "))
+    (if (y-or-n-p "Compress or uncompress ~A ?" (if (= 1 (length items)) (car items) (format nil "[~D items]" (length items))))
 	(progn
 	  (long-operation
 	    (mapc #'(lambda (item)
@@ -843,7 +843,7 @@
 		  (if (if (numberp *xdired-large-file-warning-threshold*)
 			  (let ((filelen (file-length path)))
 			    (if (<= *xdired-large-file-warning-threshold* filelen)
-				(y-or-n-p (format nil "File ~A is TOO large(~:Dbytes), really open?" (file-namestring path) filelen))
+				(y-or-n-p "File ~A is TOO large(~:Dbytes), really open?" (file-namestring path) filelen)
 			      t))
 			t)
 		      (funcall (or find-file-function 'find-file) (truename path)))))))
@@ -1131,7 +1131,7 @@
 				 (return t))
 			     (progn
 			       (message "[~A] Copy~A ~A" (format-date-string "%H:%M:%S") (if (eql ovr1 :overwrite) "(ovr)" "") item)
-			       (case (xdired-y-or-!-or-n-p (concat (or errmsg "Copy failed.") " Retry? "))
+			       (case (xdired-y-or-!-or-n-p (concat (or errmsg "Copy failed.") " Retry?"))
 				 (:YES (setq ovr1 :overwrite))
 				 (:ALL (setq ovr (setq ovr1 :overwrite)))
 				 (t (return nil)))))))))))
@@ -1172,7 +1172,7 @@
 			  (return t))
 		      (progn
 			(message "[~A] Copy~A ~A" (format-date-string "%H:%M:%S") (if (eql ovr :overwrite) "(ovr)" "") file)
-			(case (xdired-y-or-!-or-n-p (concat (or errmsg "Copy failed.") " Retry? "))
+			(case (xdired-y-or-!-or-n-p (concat (or errmsg "Copy failed.") " Retry?"))
 			  (:YES (setq ovr1 :overwrite))
 			  (:ALL (setq ovr (setq ovr1 :overwrite)))
 			  (t (return nil)))))))))
@@ -1182,11 +1182,11 @@
 (defun xdired--delete (items recycle)
   "Delete all marked files, or the current file."
   (if (< 0 (length items))
-      (if (y-or-n-p (concat (if recycle "Recycle " "Delete ")
-			    (if (= 1 (length items))
-				(car items)
-			      (format nil "[~D items]" (length items)))
-			    " "))
+      (if (y-or-n-p "~A ~A ?"
+		    (if recycle "Recycle" "Delete")
+		    (if (= 1 (length items))
+			(car items)
+		      (format nil "[~D items]" (length items))))
 	  (xdired-delete items recycle))))
 
 (defun xdired-delete (items recycle)
@@ -1214,7 +1214,7 @@
 				 (return t))
 			     (progn
 			       (message "[~A] ~A ~A" (format-date-string "%H:%M:%S") (if recycle "Recycle" "Delete") item)
-			       (case (xdired-y-or-!-or-n-p (concat (or errmsg "Deletion failed.") " Retry? "))
+			       (case (xdired-y-or-!-or-n-p (concat (or errmsg "Deletion failed.") " Retry?"))
 				 (:YES (setq force1 :force))
 				 (:ALL (setq force (setq force1 :force)))
 				 (t (return nil)))))))))))
@@ -1253,7 +1253,7 @@
 				      (return t))
 				  (progn
 				    (message "[~A] ~A ~A" (format-date-string "%H:%M:%S") (or recycle "Recycle" "Delete") filepath)
-				    (case (xdired-y-or-!-or-n-p (concat (or errmsg "Deletion failed.") " Retry? "))
+				    (case (xdired-y-or-!-or-n-p (concat (or errmsg "Deletion failed.") " Retry?"))
 				      (:YES (setq force1 :force))
 				      (:ALL (setq force (setq force1 :force)))
 				      (t (return nil)))))
@@ -1273,7 +1273,7 @@
 			  (return t)
 			(progn
 			  (message "[~A] rmdir: ~A" (format-date-string "%H:%M:%S") path)
-			  (case (xdired-y-or-!-or-n-p (concat (or errmsg "Deletion failed.") " Retry? "))
+			  (case (xdired-y-or-!-or-n-p (concat (or errmsg "Deletion failed.") " Retry?"))
 			    (:YES (setq force1 :force))
 			    (:ALL (setq force (setq force1 :force)))
 			    (t (return nil)))))
