@@ -1,14 +1,18 @@
 # xdired
+
 pseudo directory editor for [xyzzy text editor](https://ja.wikipedia.org/wiki/Xyzzy).
 
 # 使い方
-require して`xdired`関数を呼び出します。操作方法は凡そ[dired](https://en.wikipedia.org/wiki/Dired)のようなものですが、一部筆者の設定を追加しています。
-昔のファイラのようにコマンドを登録して使うには`*xdired-send-to-list*`変数に`'("呼出名称" "コマンドライン")`を追加してください。diredのコマンド実行と同様、`?`を選択項目に置換して実行します。`xdired-read-send-to-folder`関数でユーザの送るフォルダの内容から起こすことができます。
 
-書庫用の[xtared](https://github.com/EXCWSM/xtared)と組み合わせて使うことができます。
+require して`xdired`関数を呼び出します。操作方法は凡そ[dired](https://en.wikipedia.org/wiki/Dired)のようなものですが、一部筆者の設定を追加しています。
+
+昔のファイラのようにコマンドを登録して使うには `*xdired-send-to-list*` 変数に `'("呼出名称" "コマンドライン")` を追加してください。diredのコマンド実行と同様、`?`を選択項目に置換して実行します。`xdired-read-send-to-folder` 関数でユーザの `SendTo` フォルダの内容から起こすことができます。
+
+同梱の`xtared`を有効にしておけばxyzzyが対応している書庫を操作できます。当初xtaredは別レポジトリにしていましたが合併しました。
 
 ## 設定例
 
+```elisp
     (require "xdired")
     (global-set-key '(#\C-x #\d) 'xdired)
     (setq *xdired-send-to-list*
@@ -16,8 +20,13 @@ require して`xdired`関数を呼び出します。操作方法は凡そ[dired]
                     ("recycle" "explorer.exe ::{645FF040-5081-101B-9F08-00AA002F954E} ,"))
                    (xdired::xdired-read-send-to-folder)
                    ))
+    ;; 書庫操作も行う場合
+    (require "xtared")
+    (setq *xdired-find-tar-function* 'xtared::xtared)
+    (setq *xdired-find-tar-other-window-function* 'xtared::xtared-other-window)
+```
 
-## 既定の操作
+## xdired の既定の操作
 
 | キー | 内容 |
 | ---- | ---- |
@@ -50,7 +59,8 @@ require して`xdired`関数を呼び出します。操作方法は凡そ[dired]
 | +    | ディレクトリ作成 |
 | =    | diff |
 | ESC = | マーク済項目の数と合計ファイルサイズ |
-| \    | ルートディレクトリを訪問 |
+| \\   | 上のディレクトリを訪問 |
+| M-\\ | ルートディレクトリを訪問 |
 | ｜   | コマンド実行 |
 | * .  | 拡張子指定でマーク |
 | * /  | ディレクトリをマーク |
@@ -66,3 +76,29 @@ require して`xdired`関数を呼び出します。操作方法は凡そ[dired]
 | M-g M-g | xyzzy標準のgrepダイアログを開く |
 | C-h | マークを解除してカーソルを上へ |
 | ESC C-h | すべてのマークを解除 |
+
+## xtared の既定の操作
+
+| キー | 内容 |
+| ---- | ---- |
+| C    | 解凍 |
+| d    | 削除フラグ |
+| D    | カーソル行の項目を削除 |
+| g    | 再読み込み |
+| m    | マーク |
+| o    | 他のウィンドウで訪問 |
+| q    | バッファを閉じる |
+| s    | ソート変更 |
+| t    | マークの反転 |
+| u    | マーク解除 |
+| U    | すべてのマークを解除 |
+| v    | 読み取り専用で訪問 |
+| x    | 削除実行 |
+| Z    | すべて解凍 |
+| ESC = | マーク済項目の数と合計ファイルサイズ |
+| * .  | 拡張子指定でマーク |
+| * /  | ディレクトリをマーク |
+| * *  | 実行ファイルをマーク |
+| * c  | マークを変更 |
+| % m  | 正規表現でマーク |
+| C-h | マークを解除してカーソルを上へ |
